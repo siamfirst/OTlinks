@@ -8,8 +8,6 @@ export const storept = defineStore("storept",()=>{
     }
     
 })
-
-
 if (import.meta.hot) {
     import.meta.hot.accept(acceptHMRUpdate(storept, import.meta.hot))
 }

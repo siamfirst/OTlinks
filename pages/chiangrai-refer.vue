@@ -6,14 +6,14 @@
       <h2 class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">Refer back</h2>
     </div>
     <nuxt-link to="/otworking">
-        back </nuxt-link>
+      back </nuxt-link>
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
       <form @submit.prevent="referback" class="space-y-6">
         <div>
           <label for="text" class="block text-sm font-medium leading-6 text-gray-900">
             Name</label>
           <div class="mt-2">
-            <input type="text"  v-model="namept"
+            <input type="text" v-model="namept"
               class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
           </div>
         </div>
@@ -30,14 +30,14 @@
           Hospital</label>
         <select v-model="hospitalpt"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-          <option v-for="i in hospitalname" v-bind:key="i.nameH" :value="i.val" >{{ i.nameH }}</option>
+          <option v-for="i in hospitalname" v-bind:key="i.nameH" :value="i.val">{{ i.nameH }}</option>
         </select>
         <label for="text" class="block text-sm font-medium leading-6 text-gray-900">
           Dx</label>
         <div>
           <select v-model="dxpt"
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-            <option v-for="d in hospitaldx" v-bind:key="d.name" :value="d.val" >{{ d.name }}</option>
+            <option v-for="d in hospitaldx" v-bind:key="d.name" :value="d.val">{{ d.name }}</option>
           </select>
         </div>
         <div>
@@ -60,14 +60,14 @@
           {{ urlimg }}
         </div>
 
-         <div>
+        <div>
           <label class="block text-sm font-medium leading-6 text-gray-900">
             Dr.note</label>
           <div class="mt-2">
             <textarea v-model="Drnote"
-            class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
-            </textarea> 
-            </div>
+              class="pl-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6">
+            </textarea>
+          </div>
         </div>
         <div>
           <button type="submit"
@@ -82,7 +82,7 @@
 
 <script setup lang="ts">
 
-import { collection,doc,setDoc ,Timestamp, arrayUnion } from 'firebase/firestore'
+import { collection, doc, setDoc, Timestamp, arrayUnion } from 'firebase/firestore'
 
 const db = inject('db')
 const user = inject('user')
@@ -106,55 +106,58 @@ const onFileChange = async (e: any) => {
 //saveFile("","")
 
 async function referback() {
+  /** */sendrecall()
   const docData = {
     Dr_note: Drnote.value,
-    Dx:dxpt.value,
-    Hospital:hospitalpt.value,
-    Name:namept.value,
-    OT_note:null,
-    OT_note_date:Timestamp.fromDate(new Date()),
-    Surname:surnamept.value,
-    Tel:ownertelpt.value,
-    date_refer:Timestamp.fromDate(new Date()),
-    refer_paper:urlimg.value,
+    Dx: dxpt.value,
+    Hospital: hospitalpt.value,
+    Name: namept.value,
+    OT_note: null,
+    OT_note_date: Timestamp.fromDate(new Date()),
+    Surname: surnamept.value,
+    Tel: ownertelpt.value,
+    date_refer: Timestamp.fromDate(new Date()),
+    refer_paper: urlimg.value,
     user_email_hos: arrayUnion(user?.value?.email)
   }
- 
-  const OTRef= doc(collection(db,'pt'))
-  await setDoc(OTRef,docData)
-  .then(() => {
-     namept.value = ''
- surnamept.value = ''
- hospitalpt.value = ''
- dxpt.value = ''
- ownertelpt.value = ''
- urlimg.value = ''
- Drnote.value = ''
-      
+
+  const OTRef = doc(collection(db, 'pt'))
+  await setDoc(OTRef, docData)
+    .then(() => {
+      namept.value = ''
+      surnamept.value = ''
+      hospitalpt.value = ''
+      dxpt.value = ''
+      ownertelpt.value = ''
+      urlimg.value = ''
+      Drnote.value = ''
       console.log('Successfully updated the record')
-      window.location.reload()
+      // sendrecall()
+      //navigateTo('/otworking')
+      
     })
     .catch(error => {
       console.error('There was an error editing the record: ' + error)
     })
   //date.value = new Date()
-//console.log('hospital name'+hospitalpt.value+'Dx : '+dxpt.value)
-//console.log('data is: '+namept.value+surnamept.value+hospitalpt.value+dxpt.value+
-//ownertelpt.value+urlimg.value+Drnote.value+date.value+user)
+  //console.log('hospital name'+hospitalpt.value+'Dx : '+dxpt.value)
+  //console.log('data is: '+namept.value+surnamept.value+hospitalpt.value+dxpt.value+
+  //ownertelpt.value+urlimg.value+Drnote.value+date.value+user)
 }
-async function sendrecall() {
 
- 
-  if (  hospitalpt.value != null) {
-    const res = await $fetch("/api/linemessage", {
+async function sendrecall() {
+  const urllink = "https://ot-links.vercel.app "
+  if (hospitalpt.value!= null) {
+     const res = await $fetch("/api/linemessage", {
       method: "POST",
       body: {
-        message:"@ _ "+hospitalpt.value ,
+        message:"\n"+hospitalpt.value+"\n"+urllink,
         token: 'V8El6mboVv2Ho88WazSYr6AEW6BkwM2a00QGlpFHmHz',
       },
     }
     );
     return window.alert('success')
+
   } else {
     alert('Please full fill')
   }

@@ -74,6 +74,7 @@ import {
   signOut,
   signInWithEmailAndPassword
 } from "firebase/auth";
+import { openuser } from '~/store/user'
 
 
 const auth = inject('auth')
@@ -81,7 +82,7 @@ const user = inject('user')
 const uname = ref()
 const upass = ref()
 const openreset = ref(false)
-
+const store = openuser()
 
 function openresetpass() {
   openreset.value = true
@@ -91,6 +92,7 @@ async function login() {
   signInWithEmailAndPassword(auth, uname.value, upass.value)
     .then((userCredential) => {
       if (user?.value?.email != null) {
+        store.compairadmin(user?.value?.email)
         navigateTo('/otworking')
         console.log(userCredential)
       } else {

@@ -12,10 +12,9 @@ export default defineNuxtPlugin((nuxtApp) => {
   measurementId: "G-XXSFSX4EFT"
   }
   initializeApp(firebaseConfig)
-  const { auth,user ,signout } = useAuth()
+  const { auth,user  } = useAuth()
   const {db} = useDb()
   
-  nuxtApp.vueApp.provide('signout',signout)
   nuxtApp.vueApp.provide('db',db)
   nuxtApp.vueApp.provide('auth', auth)
   nuxtApp.vueApp.provide('user', user)

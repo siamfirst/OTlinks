@@ -5,7 +5,8 @@ export const openuser = defineStore({
     state:()=>{
         return {
             adduser:false as boolean,
-            admin:false as boolean
+            admin:false as boolean,
+            
         }
     },
     actions:{

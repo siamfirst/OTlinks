@@ -4,23 +4,24 @@
       <img class="mx-auto h-10 w-auto" src="/fourty_OT.png" alt="OTCR">
     </div>
     <div class="text-xs text-gray-400 flex justify-center">
-    USER :  {{ me }}
+    {{ me }}{{ adduser }}
     </div>
 
     <div class="flex justify-between">
       <div class="bg-transparent  text-sm text-blue-500 font-semibold  px-2 py-2">
 
       </div>
-  <button class="rounded-md bg-green-400 focus-visible:outline-2 px-2 mt-1" @click="signoutOTlinks">logout</button>
+  <button class="rounded-md bg-green-400 focus-visible:outline-2 px-2 mt-1" @click="logout">logout</button>
     </div>
     <!-- refer back -->
-    <div class="flex">
+    <div class="flex" v-if=admin>
       <nuxt-link to="/chiangrai-refer" class="text-red-600 text-sm">refer back</nuxt-link>|
-      <button class="text-green-600 text-sm">open form new user</button>|
-      <button class="text-green-600 text-sm">close form new user</button>
+      <button @click="showuserdialog" class="text-green-600 text-sm">open form new user</button>|
+      <button @click="hinduserdialog" class="text-green-600 text-sm">close form new user</button>
     </div>
     <!-- New user form -->
-    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div v-if=admin>
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm" v-if=adduser >
       <form @submit.prevent="Signup" class="space-y-6 pb-6 rounded-md border-2 px-4">
         <div class="w-full flex justify-center text-green-700">New user form</div>
         <div>
@@ -56,6 +57,9 @@
       <div>
       </div>
     </div>
+    </div>
+
+   
 
     <!-- data -->
 
@@ -98,10 +102,11 @@
                   {{ new Date(todo.OT_note_date.seconds * 1000).toLocaleDateString("th-TH") }}
                   {{ new Date(todo.OT_note_date.seconds * 1000).toLocaleTimeString("th-TH") }}
                 </p>
-                <textarea type="text" v-model="anser"
+      
+                <textarea type="text" v-model="anser" v-if= !admin 
                   class=" pl-2 block w-3/4 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-xs sm:leading-6"></textarea>
               </div>
-              <button class="w-1/4 h-6 text-sm bg-red-400 rounded-md "
+              <button class="w-1/4 h-6 text-sm bg-red-400 rounded-md " v-if=!admin
                 @click="anserme(anser, todo.Iditem)">ตอบกลับ</button>
             </div>
           </div>
@@ -112,41 +117,52 @@
   </div>
 </template>
 <script setup lang="ts">
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword ,signOut } from "firebase/auth";
 import { doc, setDoc, getDocs, arrayUnion, query, where } from 'firebase/firestore'
 import { collection } from "firebase/firestore";
-import { storept } from '~/store/datapt'
+import { openuser } from '~/store/user'
 import { storeToRefs } from 'pinia'
-const { todostore } = storeToRefs(storept())
 
+
+const { admin,adduser } = storeToRefs(openuser())
+const opn = openuser()
 
 const uname = ref()
 const upass = ref()
 const hospitalpt = ref()
 const auth = inject('auth')
 const user = inject('user')
-const signoutoff = inject('signout')
 const anser = ref()
 const db = inject('db')
 const todos = ref()
 const hospitalnameitem = ref()
 const me = ref()
-const signoutOTlinks=(()=>{
-  signoutoff
-})
+
 
 onMounted(() => {
   me.value = user?.value?.email
   readdata()
  
-}),
+})
 
- async function signoff(){
+function showuserdialog() {
+  opn.showdialoguser()
+}
 
- await signoutoff
- return navigateTo('/login')
-  }
-
+function hinduserdialog() {
+  opn.hinddialoguser()
+} 
+ function logout() {
+  signOut(auth).then(() => {
+        navigateTo('/login')
+    })
+    .catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      window.alert(errorCode + errorMessage)
+    });
+  //window.alert('User name is :' + uname.value + '  and Password is : ' + upass.value)
+}
 
 async function readdata() {
   const todoss: any = [];
@@ -171,7 +187,7 @@ async function readdata() {
       }
       todoss.push(ptmembercr)
       todos.value = todoss
-      todostore.value = todoss
+     
 
     })
 
@@ -204,7 +220,7 @@ async function readdata() {
       }
       todoss.push(ptmember)
       todos.value = todoss
-      todostore.value = todoss
+      
     })
   }
 }
@@ -249,7 +265,7 @@ async function Signup() {
 }
 
 function getdays(dat: any, crhdat: any) {
-  if (dat = crhdat) {
+  if (dat == crhdat) {
     return 0
   } else {
     const firstDate = new Date(dat) // 10th May, 2022
